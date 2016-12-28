@@ -1,9 +1,16 @@
 
 from Models import *
 import requests
+import yaml
 
 
 def main():
+
+    data = open("config.yml")
+    data_map = yaml.load(data)
+    data.close()
+
+    print json.dumps(data_map['email'], indent=4)
 
     # What we're searching for, separated by 'OR'
     # synonyms should be in the array
@@ -27,9 +34,9 @@ def main():
     }
 
     # How old can the posts be
-    time = 'now-1d'
+    time = 'now-30d'
 
-    request = Request(query_strings, time=time, count=100)
+    request = Request(query_strings, time=time, count=10)
 
     r = requests.post(
         url='https://search.whoishiring.io/item/item/_search?scroll=10m',
@@ -46,18 +53,32 @@ def main():
         data = data["hits"]["hits"]
 
         for dict in data:
-            description = dict["_source"]["description"]
-            print dict["_source"]["company"]
 
-            # match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
-            # if match is not None:
-            #     print dict["_source"]["company"], match.group()
+            description = dict["_source"]["description"]
+            company = dict["_source"]["company"]
+
+            # get email
+            match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
+            if match is not None:
+                email = match.group()
+            else:
+                email = ""
+
+            print company
+            description = strip_all(description)
+            counter = CategoryCounter(categories, description.split())
+
+            print "score:", json.dumps(dict["_score"])
+            if len(email) > 0:
+                print email
+            print counter.get_counts()
+            print
 
             # for html
             # description = re.sub(r'<[/]?[\w]*>', " ", description)
 
-            print description
-            print
+            # print description
+            # print
 
 
 if __name__ == '__main__':

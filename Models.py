@@ -1,6 +1,7 @@
 
 import json
 import re
+import yaml
 from collections import Counter
 
 
@@ -214,9 +215,12 @@ class TrieCategoryCounter(object):
 
 class CategoryCounter(object):
 
-    def __init__(self, categories={}, counter=None):
+    def __init__(self, categories={}, array=[]):
         self.categories = categories
-        self.counter = counter
+        if len(array) > 0:
+            self.counter = Counter(array)
+        else:
+            self.counter = None
 
     # Takes category and its associated words
     def add_category(self, category, words):
@@ -238,27 +242,6 @@ class CategoryCounter(object):
         return counts
 
 
-def main():
-
-    categories = {
-        'ios':      ['ios', 'swift', 'objective-c', 'objective c'],
-        'java':     ['java'],
-        'web':      ['angular', 'angularjs', 'angular js', 'html', 'css', 'javascript'],
-        'aws':      ['aws', 'amazon', 'cloud'],
-        'junior':   ['junior', 'entry']
-    }
-
-    categories = CategoryCounter(categories)
-
-    with open("description.txt") as data:
-
-        data = strip_all(data.read())
-        print(data.split())
-        categories.count(data.split())
-
-        print categories.get_counts()
-
-
 def strip_with_regex(string, regex):
     return re.sub(r'\s+', ' ', re.sub(regex, " ", string)).lower()
 
@@ -266,6 +249,3 @@ def strip_with_regex(string, regex):
 def strip_all(string):
     regex = r'(<[^>]*>|[!\?#-\.\'";:,\+\(\)])'
     return strip_with_regex(string, regex)
-
-if __name__ == '__main__':
-    main()
