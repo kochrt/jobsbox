@@ -1,72 +1,93 @@
 
+# how far back to query
+post_age: now-30d
+
+# how many results to get
+num_results: 10
+
 # query is for the actual search sent to the server,
 # separated by OR
+#
 # keywords are used to search the post description that returns
 # to determine relevancy
 categories:
   ios:
     query:
-      - 'ios'
+      - ios
     keywords:
-      - 'ios'
-      - 'swift'
-      - 'objective-c'
-      - 'objective c'
-    email: >
+      - ios
+      - swift
+      - objective-c
+      - objective c
+    email_primary: >
       I have a good deal of iOS and Swift experience,
       with an app on the app store and a few more in the pipeline.
+    email_secondary: >
+
   java:
     query:
-      - 'java'
+      - java
     keywords:
-      - 'java'
-    email: >
+      - java
+    email_primary: >
+      Java is one of my strongest languages as I've been
+      using it the longest.
+    email_secondary: >
 
   web:
     query:
-      - 'angular'
-      - 'angularjs'
-      - 'angular2'
-      - 'angular.js'
+      - angular
+      - angularjs
+      - angular2
+      - angular.js
     keywords:
-      - 'angular'
-      - 'angularjs'
-      - 'angular js'
-      - 'html'
-      - 'css'
-      - 'javascript'
-    email: >
+      - angular
+      - angularjs
+      - angular js
+      - html
+      - css
+      - javascript
+    email_primary: >
       I have web development experience (specifically with Angular),
+      both in creating my own sites and with Ionic.
+    email_secondary: >
 
   aws:
     query:
-      - 'aws'
+      - aws
     keywords:
-      - 'aws'
-      - 'amazon'
-      - 'cloud'
+      - aws
+      - amazon
+      - cloud
+    email_primary: >
+      I have a fair bit of experience with cloud solutions;
+      I was most recently at Cardinal Health working with AWS
+      on their cloud engineering team.
+    email_secondary: >
+
   junior:
     query:
-      - 'junior'
+      - junior
     keywords:
-      - 'junior'
-      - 'entry'
+      - junior
+      - entry
 
 email:
-  smtp_server: 'something.google.com'
+  smtp_server: something.google.com
 
   # {0} - Posting site (Hacker News, Stack Overflow, etc.)
   # {1} - Company name
-  # {2} - Primary match email blurb
+  # {2} - Primary match email blurb from the categories dictionary above
+  # {3} - Extra email part
 
-  subject: 'Interested in {1}'
+  subject: Interested in {1}
 
   body_prefix: |
     Hello,
 
     I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
 
-    {2}
+    {2} {3}
 
     <a href='robko.ch'>Here's my resume</a> - if you think there might be something for me I'd love to hear back from you.
 
