@@ -241,6 +241,9 @@ class CategoryCounter(object):
             counts[cat] = self.get_count(cat)
         return counts
 
+    def get_counts_ordered(self):
+        return Counter(self.get_counts()).most_common()
+
 
 def strip_with_regex(string, regex):
     return re.sub(r'\s+', ' ', re.sub(regex, " ", string)).lower()
@@ -249,3 +252,11 @@ def strip_with_regex(string, regex):
 def strip_all(string):
     regex = r'(<[^>]*>|[!\?#-\.\'";:,\+\(\)])'
     return strip_with_regex(string, regex)
+
+
+class Email(object):
+
+    def __init__(self):
+        self.subject = ''
+        self.body = ''
+        self.to = ''

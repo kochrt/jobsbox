@@ -1,5 +1,6 @@
 
 '''
+use_email_file: true
 
 post_age: now-30d
 
@@ -23,31 +24,26 @@ email:
 from Models import *
 import requests
 import yaml
+import os
 
 
 def main():
 
-    data = open('config.yml')
-    data_map = yaml.load(data)
-    data.close()
-
-    print json.dumps(data_map, indent=4)
+    # get configuration
+    config = load_config()
 
     query_strings = []
     categories = {}
-    for category, vals in data_map['categories'].iteritems():
+    for category, vals in config['categories'].iteritems():
         query_strings.append(vals['query'])
         categories[category] = vals['keywords']
 
-    print 'categories', json.dumps(categories, indent=4)
-    print 'query strings', json.dumps(query_strings, indent=4)
-
-    # How old can the posts be
-    time = data_map['post_age']
-    count = data_map['num_results']
+    time = config['post_age'] if 'post_age' in config else 'now-1d'
+    count = config['num_results'] if 'num_results' in config else 20
 
     request = Request(query_strings, time=time, count=count)
 
+    # make the request with the given parameters
     r = requests.post(
         url='https://search.whoishiring.io/item/item/_search?scroll=10m',
         data=json.dumps(request.query)
@@ -64,32 +60,52 @@ def main():
 
         for dict in data:
 
-            description = dict['_source']['description']
-            company = dict['_source']['company']
+            # get email from the description if it is there
+            email = get_email(description)
 
-            # get email
-            match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
-            if match is not None:
-                email = match.group()
-            else:
-                email = ''
-
-            print company
-            description = strip_all(description)
-            counter = CategoryCounter(categories, description.split())
-
-            print 'score:', json.dumps(dict['_score'])
             if len(email) > 0:
                 print email
-            print counter.get_counts()
-            print
 
-            # for html
-            # description = re.sub(r'<[/]?[\w]*>', ' ', description)
+                # Job description
+                description = dict['_source']['description']
 
-            # print description
-            # print
+                # Company name truncated
+                company = re.sub(r'[,(].*$', "", dict['_source']['company'])
 
+                description = strip_all(description)
+                counter = CategoryCounter(categories, description.split())
+
+                counts = counter.get_counts_ordered()
+                most_common = counts[0][0]
+                primary_email_blurb = config['categories'][most_common]['email_primary']
+
+                # print primary_email_blurb
+                #
+                # print 'score:', json.dumps(dict['_score'])
+                # print json.dumps(counter.get_counts_ordered(), indent=2)
+                # print
+
+                # for html
+                # description = re.sub(r'<[/]?[\w]*>', ' ', description)
+
+                # print description
+                # print
+
+
+def load_config():
+    try:
+        data = open('config.yml')
+        data_map = yaml.load(data)
+        data.close()
+        return data_map
+    except IOError:
+        print('error opening config file (config.yml)')
+        exit()
+
+
+def get_email(description):
+    match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
+    return match.group() if match is not None else ''
 
 if __name__ == '__main__':
     main()

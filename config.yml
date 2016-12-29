@@ -1,9 +1,13 @@
 
+# use an additional file to keep track of who has been emailed
+# so they won't be emailed again
+use_email_file: true
+
 # how far back to query
 post_age: now-30d
 
 # how many results to get
-num_results: 10
+num_results: 100
 
 # query is for the actual search sent to the server,
 # separated by OR
@@ -73,7 +77,7 @@ categories:
       - entry
 
 email:
-  smtp_server: something.google.com
+  smtp_server: mail.google.com
 
   # {0} - Posting site (Hacker News, Stack Overflow, etc.)
   # {1} - Company name
@@ -81,8 +85,7 @@ email:
   # {3} - Extra email part
 
   subject: Interested in {1}
-
-  body_prefix: |
+  body: |
     Hello,
 
     I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
