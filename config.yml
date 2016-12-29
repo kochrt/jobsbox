@@ -96,9 +96,7 @@ email:
     Hello,
 
     I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
-
     {2} {3}
-
     My resume can be seen here (http://robko.ch) - if you think there might be something for me I'd love to hear back from you.
 
     Thanks!
@@ -109,9 +107,7 @@ email:
     Hello,
 
     I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
-
     {2} {3}
-
     <a href='robko.ch'>Here's my resume</a> - if you think there might be something for me I'd love to hear back from you.
 
     Thanks!

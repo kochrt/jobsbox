@@ -42,6 +42,16 @@ HITS = 'hits'
 
 REQUEST_URL = 'https://search.whoishiring.io/item/item/_search?scroll=10m'
 
+SOURCE_MAPPING = {
+    'so': 'Stack Overflow',
+    'hn': 'Hacker News',
+    'bo': 'Boolerang',
+    'aj': 'Authentic Jobs',
+    'ww': 'We Work Remotely',
+    'cf': 'Coroflot',
+    'gh': "Github",
+    'wh': "Who is Hiring"
+}
 
 def main():
 
@@ -77,7 +87,6 @@ def main():
 
         try:
             password = open(config['password']).read()
-            print password
         except IOError:
             print("password file could not be opened")
             exit()
@@ -89,13 +98,28 @@ def main():
             # Job description
             description = dict['_source']['description']
 
-            # get email from the description if it is there
-            email_address = get_email(description)
+            # get email from the description/'apply' if it is there
+            email_address = get_email(dict['_source']['apply'])
+            if len(email_address) == 0:
+                email_address = get_email(description)
 
-            if len(email_address) > 0:
+            if len(email_address) == 0:
+                # do something even if we can't email
+                pass
+            else:
+                substitutions = {}
+
+                source_abbreviation = dict['_source']['source_name']
+                if source_abbreviation not in SOURCE_MAPPING:
+                    log('new source encountered: %s' % source_abbreviation)
+                    log(json.dumps(dict['_source'], indent=2))
+                    substitutions['{0}'] = SOURCE_MAPPING['wh']
+                else:
+                    substitutions['{0}'] = SOURCE_MAPPING[source_abbreviation]
 
                 # Company name truncated
                 company = re.sub(r'[,(].*$', "", dict['_source']['company'])
+                substitutions['{1}'] = company
 
                 description = strip_all(description)
                 counter = CategoryCounter(categories, description.split())
@@ -105,7 +129,7 @@ def main():
 
                 if EMAIL_PRIMARY in config[CATEGORIES][most_common]:
                     primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
-
+                    substitutions['{2}'] = primary_email_blurb
                 else:
                     pass
                     # don't put anything extra in email body
@@ -137,6 +161,11 @@ def load_config():
 def get_email(description):
     match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
     return match.group() if match is not None else ''
+
+
+def log(string):
+    # TODO: should output to log file
+    print string
 
 
 if __name__ == '__main__':
