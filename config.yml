@@ -9,6 +9,9 @@ post_age: now-30d
 # how many results to get
 num_results: 100
 
+# file that has your gmail password
+password: password.txt
+
 # query is for the actual search sent to the server,
 # separated by OR
 #
@@ -76,6 +79,9 @@ categories:
       - junior
       - entry
 
+      # if there's no email_primary, neither email_primary nor email_secondary
+      # will be inserted into the email
+
 email:
   smtp_server: mail.google.com
 
@@ -85,7 +91,21 @@ email:
   # {3} - Extra email part
 
   subject: Interested in {1}
-  body: |
+
+  body_plaintext: |
+    Hello,
+
+    I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
+
+    {2} {3}
+
+    My resume can be seen here (http://robko.ch) - if you think there might be something for me I'd love to hear back from you.
+
+    Thanks!
+
+    Rob Koch
+
+  body_html: |
     Hello,
 
     I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.

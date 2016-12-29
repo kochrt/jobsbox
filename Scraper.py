@@ -24,7 +24,23 @@ email:
 from Models import *
 import requests
 import yaml
+from gmail import *
 import os
+
+CONFIG = 'config.yml'
+
+CATEGORIES = 'categories'
+EMAIL = 'email'
+SUBJECT = 'subject'
+
+QUERY = 'query'
+KEYWORDS = 'keywords'
+EMAIL_PRIMARY = 'email_primary'
+POST_AGE = 'post_age'
+NUM_RESULTS = 'num_results'
+HITS = 'hits'
+
+REQUEST_URL = 'https://search.whoishiring.io/item/item/_search?scroll=10m'
 
 
 def main():
@@ -34,40 +50,49 @@ def main():
 
     query_strings = []
     categories = {}
-    for category, vals in config['categories'].iteritems():
-        query_strings.append(vals['query'])
-        categories[category] = vals['keywords']
+    for category, vals in config[CATEGORIES].iteritems():
+        query_strings.append(vals[QUERY])
+        categories[category] = vals[KEYWORDS]
 
-    time = config['post_age'] if 'post_age' in config else 'now-1d'
-    count = config['num_results'] if 'num_results' in config else 20
+    time = config[POST_AGE] if POST_AGE in config else 'now-1d'
+    count = config[NUM_RESULTS] if NUM_RESULTS in config else 20
 
     request = Request(query_strings, time=time, count=count)
 
     # make the request with the given parameters
     r = requests.post(
-        url='https://search.whoishiring.io/item/item/_search?scroll=10m',
+        url=REQUEST_URL,
         data=json.dumps(request.query)
     )
 
+    # get response text
     data = json.loads(r.text)
 
     if data['timed_out']:
         print('request timed out')
-    elif data['hits']['total'] < 1:
+    elif data[HITS]['total'] < 1:
         print('nothing found')
     else:
-        data = data['hits']['hits']
+        data = data[HITS][HITS]
+
+        try:
+            password = open(config['password']).read()
+            print password
+        except IOError:
+            print("password file could not be opened")
+            exit()
+
+        gmail = GMail('kochrt@gmail.com', password)
 
         for dict in data:
 
+            # Job description
+            description = dict['_source']['description']
+
             # get email from the description if it is there
-            email = get_email(description)
+            email_address = get_email(description)
 
-            if len(email) > 0:
-                print email
-
-                # Job description
-                description = dict['_source']['description']
+            if len(email_address) > 0:
 
                 # Company name truncated
                 company = re.sub(r'[,(].*$', "", dict['_source']['company'])
@@ -77,7 +102,13 @@ def main():
 
                 counts = counter.get_counts_ordered()
                 most_common = counts[0][0]
-                primary_email_blurb = config['categories'][most_common]['email_primary']
+
+                if EMAIL_PRIMARY in config[CATEGORIES][most_common]:
+                    primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
+
+                else:
+                    pass
+                    # don't put anything extra in email body
 
                 # print primary_email_blurb
                 #
@@ -94,18 +125,19 @@ def main():
 
 def load_config():
     try:
-        data = open('config.yml')
+        data = open(CONFIG)
         data_map = yaml.load(data)
         data.close()
         return data_map
     except IOError:
-        print('error opening config file (config.yml)')
+        print('error opening config file')
         exit()
 
 
 def get_email(description):
     match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
     return match.group() if match is not None else ''
+
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,6 @@
 
 import json
 import re
-import yaml
 from collections import Counter
 
 
@@ -252,11 +251,3 @@ def strip_with_regex(string, regex):
 def strip_all(string):
     regex = r'(<[^>]*>|[!\?#-\.\'";:,\+\(\)])'
     return strip_with_regex(string, regex)
-
-
-class Email(object):
-
-    def __init__(self):
-        self.subject = ''
-        self.body = ''
-        self.to = ''
