@@ -25,6 +25,7 @@ from Models import *
 import requests
 import yaml
 from gmail import *
+import re
 import os
 
 CONFIG = 'config.yml'
@@ -93,13 +94,14 @@ def main():
 
         gmail = GMail('kochrt@gmail.com', password)
 
-        for dict in data:
+        # iterate over results
+        for result in data:
 
             # Job description
-            description = dict['_source']['description']
+            description = result['_source']['description']
 
-            # get email from the description/'apply' if it is there
-            email_address = get_email(dict['_source']['apply'])
+            # get email from the description/apply if it is there
+            email_address = get_email(result['_source']['apply'])
             if len(email_address) == 0:
                 email_address = get_email(description)
 
@@ -107,18 +109,27 @@ def main():
                 # do something even if we can't email
                 pass
             else:
+
+                email = {
+                    'to': email_address,
+                    'from': config['email']['from'],
+                    'subject': config['email']['subject'],
+                    'body_plaintext': config['email']['body_plaintext'],
+                    'body_html': config['email']['body_html']
+                }
+
                 substitutions = {}
 
-                source_abbreviation = dict['_source']['source_name']
+                source_abbreviation = result['_source']['source_name']
                 if source_abbreviation not in SOURCE_MAPPING:
                     log('new source encountered: %s' % source_abbreviation)
-                    log(json.dumps(dict['_source'], indent=2))
+                    log(json.dumps(result['_source'], indent=2))
                     substitutions['{0}'] = SOURCE_MAPPING['wh']
                 else:
                     substitutions['{0}'] = SOURCE_MAPPING[source_abbreviation]
 
                 # Company name truncated
-                company = re.sub(r'[,(].*$', "", dict['_source']['company'])
+                company = re.sub(r'[,(].*$', "", result['_source']['company'])
                 substitutions['{1}'] = company
 
                 description = strip_all(description)
@@ -127,16 +138,18 @@ def main():
                 counts = counter.get_counts_ordered()
                 most_common = counts[0][0]
 
+                # do replacements in the body of the email
                 if EMAIL_PRIMARY in config[CATEGORIES][most_common]:
                     primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
                     substitutions['{2}'] = primary_email_blurb
+                    print perform_substitutions(email, substitutions)
                 else:
                     pass
                     # don't put anything extra in email body
 
                 # print primary_email_blurb
                 #
-                # print 'score:', json.dumps(dict['_score'])
+                # print 'score:', json.dumps(result['_score'])
                 # print json.dumps(counter.get_counts_ordered(), indent=2)
                 # print
 
@@ -166,6 +179,16 @@ def get_email(description):
 def log(string):
     # TODO: should output to log file
     print string
+
+
+def perform_substitutions(email, substitutions):
+    replaced = {}
+    for email_key, string in email.iteritems():
+        for sub_key, replacement in substitutions.iteritems():
+            print 'replace %s with %s in %s' % (sub_key, replacement, string)
+            string = re.sub(sub_key, replacement, string)
+        replaced[email_key] = string
+    return replaced
 
 
 if __name__ == '__main__':

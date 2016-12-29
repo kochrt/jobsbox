@@ -79,11 +79,11 @@ categories:
       - junior
       - entry
 
-      # if there's no email_primary, neither email_primary nor email_secondary
-      # will be inserted into the email
+      # if there's no email_primary for a category and it is the highest ranked,
+      # neither email_primary nor email_secondary will be inserted into the email
 
 email:
-  smtp_server: mail.google.com
+  from: kochrt@gmail.com
 
   # {0} - Posting site (Hacker News, Stack Overflow, etc.)
   # {1} - Company name
