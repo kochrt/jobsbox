@@ -27,18 +27,14 @@ categories:
       - swift
       - objective-c
       - objective c
-    email_primary: >
-      \nI have a good deal of iOS and Swift experience,
-      with an app on the app store and a few more in the pipeline.
+    email_primary: \nI have a good deal of iOS and Swift experience, with an app on the app store and a few more in the pipeline.
     email_secondary: iOS and Swift (with an app in the app store)
   java:
     query:
       - java
     keywords:
       - java
-    email_primary: >
-      \nJava is one of my strongest languages as I've been
-      using it the longest.
+    email_primary: \nJava is one of my strongest languages as I've been using it the longest.
     email_secondary: Java
   web:
     query:
@@ -53,9 +49,7 @@ categories:
       - html
       - css
       - javascript
-    email_primary: >
-      \nI have web development experience (specifically with Angular),
-      both in creating my own sites and with Ionic.
+    email_primary: \nI have web development experience (specifically with Angular), both in creating my own sites and with Ionic.
     email_secondary: web development (specifically angular2)
   aws:
     query:
@@ -64,10 +58,7 @@ categories:
       - aws
       - amazon
       - cloud
-    email_primary: >
-      \nI have a fair bit of experience with cloud solutions;
-      I was most recently at Cardinal Health working with AWS
-      on their cloud engineering team.
+    email_primary: \nI have a fair bit of experience with cloud solutions; I was most recently at Cardinal Health working with AWS on their cloud engineering team.
     email_secondary: AWS
   junior:
     query:
@@ -84,11 +75,11 @@ email:
   from: kochrt@gmail.com
   company_alternative: applying
 
-  # { site } - Posting site (Hacker News, Stack Overflow, etc.)
-  # { company } - Company name else company_alternative
-  # { email_primary } - Primary match email blurb from the categories dictionary above
-  # { email_secondary } - Extra email part w/preamble (excluded if no {2})
-  # { link } - Link
+  # { site }              Posting site (Hacker News, Stack Overflow, etc.)
+  # { company }           Company name else company_alternative
+  # { email_primary }     Primary match email blurb from the categories dictionary above
+  # { email_secondary }   Extra email part w/preamble (excluded if no {2})
+  # { link }              Link
 
   subject: Interested in { company }
 
