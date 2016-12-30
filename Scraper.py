@@ -1,26 +1,4 @@
 
-'''
-use_email_file: true
-
-post_age: now-30d
-
-num_results: 100
-
-categories:
-  ~category:
-    query:
-      ~string
-    keywords:
-      ~strings
-    email_primary: >
-      ~ ~ ~
-    email_secondary: >
-      ~ ~ ~
-email:
-  
-
-'''
-
 from Models import *
 import requests
 import yaml
@@ -56,8 +34,8 @@ SOURCE_MAPPING = {
     'aj': 'Authentic Jobs',
     'ww': 'We Work Remotely',
     'cf': 'Coroflot',
-    'gh': "Github",
-    'wh': "Who is Hiring"
+    'gh': 'Github',
+    'wh': 'Who is Hiring'
 }
 
 def main():
@@ -124,6 +102,7 @@ def main():
                     'body_html': config['email']['body']
                 }
 
+                # begin amassing what substitutions we need to make
                 substitutions = {
                     EMAIL_SECONDARY_REGEX: config['email']['email_secondary_preamble']
                 }
@@ -139,31 +118,38 @@ def main():
                 # Company name truncated
                 company = re.sub(r'[,(].*$', "", result['_source']['company'])
 
-                substitutions[COMPANY_REGEX] = company if len(company) > 0 else "applying"
+                substitutions[COMPANY_REGEX] = company if len(company) > 0 else config['email']['company_alternative']
 
+                # get rid of all html and extra punctuation
                 description = strip_all(description)
+
+                # count what's left
                 counter = CategoryCounter(categories, description.split())
+                counts = counter.get_greater_than_zero()
 
-                counts = counter.get_counts_ordered()
-                most_common = counts[0][0]
-
-                # do replacements in the body of the email
-                if EMAIL_PRIMARY in config[CATEGORIES][most_common]:
-                    primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
-                    substitutions[EMAIL_PRIMARY_REGEX] = primary_email_blurb
-
-                    email = perform_substitutions(email, substitutions)
-
-                    print json.dumps(email, indent=2)
-
-                    # get rid of { email } if we don't use them
-
-                    # message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
-                    # gmail.send(message)
+                if len(counts) == 0 or EMAIL_PRIMARY not in config[CATEGORIES][counts[0][0]]:
+                    # don't add anything to the email, get rid of {email_primary}
+                    # and {email_secondary}
+                    substitutions[EMAIL_PRIMARY_REGEX] = ''
+                    substitutions[EMAIL_SECONDARY_REGEX] = ''
 
                 else:
-                    pass
-                    # don't put anything extra in email body
+                    most_common = counts[0][0]
+                    primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
+
+                    substitutions[EMAIL_PRIMARY_REGEX] = primary_email_blurb
+
+                    # TODO: round up secondary email stuff
+
+
+                email = perform_substitutions(email, substitutions)
+                print json.dumps(email, indent=2)
+
+
+                # message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
+                # gmail.send(message)
+
+                # do all other substitutions
 
                 # print primary_email_blurb
                 #
@@ -194,9 +180,10 @@ def get_email(description):
     return match.group() if match is not None else ''
 
 
-def log(string):
+def log(*string):
     # TODO: should output to log file
-    print string
+    for s in string:
+        print s
 
 
 def perform_substitutions(email, substitutions):

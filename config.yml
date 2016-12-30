@@ -1,6 +1,7 @@
 
 # use an additional file to keep track of who has been emailed
 # so they won't be emailed again
+# file does not need to exist on first run; will be generated if true
 use_email_file: true
 
 # how far back to query
@@ -27,7 +28,7 @@ categories:
       - objective-c
       - objective c
     email_primary: >
-      I have a good deal of iOS and Swift experience,
+      \nI have a good deal of iOS and Swift experience,
       with an app on the app store and a few more in the pipeline.
     email_secondary: >
       iOS and Swift (with an app in the app store)
@@ -37,7 +38,7 @@ categories:
     keywords:
       - java
     email_primary: >
-      Java is one of my strongest languages as I've been
+      \nJava is one of my strongest languages as I've been
       using it the longest.
     email_secondary: >
       Java
@@ -55,7 +56,7 @@ categories:
       - css
       - javascript
     email_primary: >
-      I have web development experience (specifically with Angular),
+      \nI have web development experience (specifically with Angular),
       both in creating my own sites and with Ionic.
     email_secondary: >
       web development (specifically angular2)
@@ -67,7 +68,7 @@ categories:
       - amazon
       - cloud
     email_primary: >
-      I have a fair bit of experience with cloud solutions;
+      \nI have a fair bit of experience with cloud solutions;
       I was most recently at Cardinal Health working with AWS
       on their cloud engineering team.
     email_secondary: >
@@ -85,17 +86,20 @@ categories:
 email:
 
   from: kochrt@gmail.com
+  company_alternative: applying
 
   # { site } - Posting site (Hacker News, Stack Overflow, etc.)
-  # { company } - Company name
+  # { company } - Company name else company_alternative
   # { email_primary } - Primary match email blurb from the categories dictionary above
   # { email_secondary } - Extra email part w/preamble (excluded if no {2})
   # { link } - Link
 
   subject: Interested in { company }
 
-  email_secondary_preamble: >
-    I also have experience with
+  # Do this because the secondary email blurb is not included if the
+  # primary isn't either
+  email_secondary_preamble: I also have experience with
+  email_secondary_suffix: \n
 
   body: |
     Hello,

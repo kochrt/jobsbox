@@ -243,6 +243,9 @@ class CategoryCounter(object):
     def get_counts_ordered(self):
         return Counter(self.get_counts()).most_common()
 
+    def get_greater_than_zero(self):
+        return [x for x in self.get_counts_ordered() if x[1] > 0]
+
 
 def strip_with_regex(string, regex):
     return re.sub(r'\s+', ' ', re.sub(regex, " ", string)).lower()
