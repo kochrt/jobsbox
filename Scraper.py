@@ -139,7 +139,8 @@ def main():
                     primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
 
                     substitutions[EMAIL_PRIMARY_REGEX] = primary_email_blurb
-
+                    print (primary_email_blurb)
+                    exit()
                     if len(counts) > 1:
                         secondary_email_blurb = config[EMAIL]['email_secondary_preamble']
                         phrases = []
@@ -151,9 +152,9 @@ def main():
                         substitutions[EMAIL_SECONDARY_REGEX] = secondary_email_blurb
                     else:
                         substitutions[EMAIL_SECONDARY_REGEX] = config[EMAIL]['email_secondary_alternative']
-
-                email = perform_substitutions(email, substitutions)
-                print email['body_plaintext']
+                
+                # email = perform_substitutions(email, substitutions)
+                # print email['body_plaintext']
 
                 # message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
                 # gmail.send(message)
