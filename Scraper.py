@@ -34,6 +34,12 @@ CATEGORIES = 'categories'
 EMAIL = 'email'
 SUBJECT = 'subject'
 
+POST_SITE_REGEX = '\{[\W]*site[\W]*\}'
+COMPANY_REGEX = '\{[\W]*company[\W]*\}'
+EMAIL_PRIMARY_REGEX = '\{[\W]*email_primary[\W]*\}'
+EMAIL_SECONDARY_REGEX = '\{[\W]*email_secondary[\W]*\}'
+LINK_REGEX = '\{[\W]*link[\W]*\}'
+
 QUERY = 'query'
 KEYWORDS = 'keywords'
 EMAIL_PRIMARY = 'email_primary'
@@ -111,26 +117,29 @@ def main():
             else:
 
                 email = {
-                    'to': email_address,
+                    'to': 'kochrt@gmail.com',
                     'from': config['email']['from'],
                     'subject': config['email']['subject'],
-                    'body_plaintext': config['email']['body_plaintext'],
-                    'body_html': config['email']['body_html']
+                    'body_plaintext': config['email']['body'],
+                    'body_html': config['email']['body']
                 }
 
-                substitutions = {}
+                substitutions = {
+                    EMAIL_SECONDARY_REGEX: config['email']['email_secondary_preamble']
+                }
 
                 source_abbreviation = result['_source']['source_name']
                 if source_abbreviation not in SOURCE_MAPPING:
                     log('new source encountered: %s' % source_abbreviation)
                     log(json.dumps(result['_source'], indent=2))
-                    substitutions['{0}'] = SOURCE_MAPPING['wh']
+                    substitutions[POST_SITE_REGEX] = SOURCE_MAPPING['wh']
                 else:
-                    substitutions['{0}'] = SOURCE_MAPPING[source_abbreviation]
+                    substitutions[POST_SITE_REGEX] = SOURCE_MAPPING[source_abbreviation]
 
                 # Company name truncated
                 company = re.sub(r'[,(].*$', "", result['_source']['company'])
-                substitutions['{1}'] = company
+
+                substitutions[COMPANY_REGEX] = company if len(company) > 0 else "applying"
 
                 description = strip_all(description)
                 counter = CategoryCounter(categories, description.split())
@@ -141,8 +150,17 @@ def main():
                 # do replacements in the body of the email
                 if EMAIL_PRIMARY in config[CATEGORIES][most_common]:
                     primary_email_blurb = config[CATEGORIES][most_common][EMAIL_PRIMARY]
-                    substitutions['{2}'] = primary_email_blurb
-                    print perform_substitutions(email, substitutions)
+                    substitutions[EMAIL_PRIMARY_REGEX] = primary_email_blurb
+
+                    email = perform_substitutions(email, substitutions)
+
+                    print json.dumps(email, indent=2)
+
+                    # get rid of { email } if we don't use them
+
+                    # message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
+                    # gmail.send(message)
+
                 else:
                     pass
                     # don't put anything extra in email body
@@ -184,9 +202,16 @@ def log(string):
 def perform_substitutions(email, substitutions):
     replaced = {}
     for email_key, string in email.iteritems():
+
         for sub_key, replacement in substitutions.iteritems():
-            print 'replace %s with %s in %s' % (sub_key, replacement, string)
+            #print 'replace %s with %s in %s' % (sub_key, replacement, string)
             string = re.sub(sub_key, replacement, string)
+
+        if email_key == 'body_html':
+            string = re.sub('\n', '<br>', string)
+        elif email_key == 'body_plaintext':
+            string = re.sub('\n', '\r\n', string)
+
         replaced[email_key] = string
     return replaced
 

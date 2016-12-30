@@ -7,7 +7,7 @@ use_email_file: true
 post_age: now-30d
 
 # how many results to get
-num_results: 100
+num_results: 30
 
 # file that has your gmail password
 password: password.txt
@@ -30,7 +30,7 @@ categories:
       I have a good deal of iOS and Swift experience,
       with an app on the app store and a few more in the pipeline.
     email_secondary: >
-
+      iOS and Swift (with an app in the app store)
   java:
     query:
       - java
@@ -40,7 +40,7 @@ categories:
       Java is one of my strongest languages as I've been
       using it the longest.
     email_secondary: >
-
+      Java
   web:
     query:
       - angular
@@ -58,7 +58,7 @@ categories:
       I have web development experience (specifically with Angular),
       both in creating my own sites and with Ionic.
     email_secondary: >
-
+      web development (specifically angular2)
   aws:
     query:
       - aws
@@ -71,7 +71,7 @@ categories:
       I was most recently at Cardinal Health working with AWS
       on their cloud engineering team.
     email_secondary: >
-
+      AWS
   junior:
     query:
       - junior
@@ -83,32 +83,26 @@ categories:
       # neither email_primary nor email_secondary will be inserted into the email
 
 email:
+
   from: kochrt@gmail.com
 
-  # {0} - Posting site (Hacker News, Stack Overflow, etc.)
-  # {1} - Company name
-  # {2} - Primary match email blurb from the categories dictionary above
-  # {3} - Extra email part
+  # { site } - Posting site (Hacker News, Stack Overflow, etc.)
+  # { company } - Company name
+  # { email_primary } - Primary match email blurb from the categories dictionary above
+  # { email_secondary } - Extra email part w/preamble (excluded if no {2})
+  # { link } - Link
 
-  subject: Interested in {1}
+  subject: Interested in { company }
 
-  body_plaintext: |
+  email_secondary_preamble: >
+    I also have experience with
+
+  body: |
     Hello,
 
-    I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
-    {2} {3}
-    My resume can be seen here (http://robko.ch) - if you think there might be something for me I'd love to hear back from you.
-
-    Thanks!
-
-    Rob Koch
-
-  body_html: |
-    Hello,
-
-    I saw your post on {0} and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
-    {2} {3}
-    <a href='robko.ch'>Here's my resume</a> - if you think there might be something for me I'd love to hear back from you.
+    I saw your post on { site } and thought I would send over my information. My name is Rob Koch, I'm a senior computer science major at Miami University. I'll be graduating in May and am looking for full-time opportunities.
+    { email_primary } { email_secondary }
+    <a href="robko.ch">Here's my resume</a> - if you think there might be something for me I'd love to hear back from you.
 
     Thanks!
 
