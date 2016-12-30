@@ -4,9 +4,12 @@ import requests
 import yaml
 from gmail import *
 import re
-import os
+import time
 
 CONFIG = 'config.yml'
+HISTORY = 'history.json'
+
+USE_EMAIL_FILE = 'use_email_file'
 
 CATEGORIES = 'categories'
 EMAIL = 'email'
@@ -43,6 +46,7 @@ def main():
 
     # get configuration
     config = load_config()
+    history = load_history()
 
     query_strings = []
     categories = {}
@@ -50,10 +54,10 @@ def main():
         query_strings.append(vals[QUERY])
         categories[category] = vals[KEYWORDS]
 
-    time = config[POST_AGE] if POST_AGE in config else 'now-1d'
+    age = config[POST_AGE] if POST_AGE in config else 'now-1d'
     count = config[NUM_RESULTS] if NUM_RESULTS in config else 20
 
-    request = Request(query_strings, time=time, count=count)
+    request = Request(query_strings, time=age, count=count)
 
     # make the request with the given parameters
     r = requests.post(
@@ -91,12 +95,19 @@ def main():
                 email_address = get_email(description)
 
             if len(email_address) == 0:
+
                 # do something even if we can't email
-                pass
+                continue
+
+            elif config[USE_EMAIL_FILE] and email_address in history:
+                log('previous email encountered: %s' % email_address)
+                continue
+                # yes I know these continues aren't necessary
+                # I'm just being explicit
             else:
 
                 email = {
-                    'to': 'koch.rt@gmail.com',
+                    'to': email_address,
                     'from': config[EMAIL]['from'],
                     'subject': config[EMAIL]['subject'],
                     'body_plaintext': config[EMAIL]['body'],
@@ -157,10 +168,21 @@ def main():
                         substitutions[EMAIL_SECONDARY_REGEX] = config[EMAIL]['email_secondary_alternative']
 
                 email = perform_substitutions(email, substitutions)
-                print email['body_plaintext']
 
                 message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
-                gmail.send(message)
+
+                history[email['to']] = {
+                    EMAIL: email,
+                    '_source': result['_source'],
+                    'time': time.time()
+                }
+
+        # save history
+        if config[USE_EMAIL_FILE]:
+            history_file = open(HISTORY, 'w')
+            json.dump(history, fp=history_file)
+        else:
+            log(json.dumps(history, indent=2))
 
 
 def load_config():
@@ -172,6 +194,16 @@ def load_config():
     except IOError:
         print('error opening config file')
         exit()
+
+
+def load_history():
+    try:
+        history = open(HISTORY, 'r')
+        history_json = json.loads(history.read())
+        history.close()
+        return history_json
+    except IOError:
+        return {}
 
 
 def get_email(description):

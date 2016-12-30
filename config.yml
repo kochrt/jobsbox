@@ -2,6 +2,7 @@
 # use an additional file to keep track of who has been emailed
 # so they won't be emailed again
 # file does not need to exist on first run; will be generated if true
+# history.json
 use_email_file: true
 
 # how far back to query
