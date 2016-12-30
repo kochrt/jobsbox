@@ -8,7 +8,7 @@ use_email_file: true
 post_age: now-30d
 
 # how many results to get
-num_results: 50
+num_results: 100
 
 # file that has your gmail password
 password: password.txt
@@ -34,7 +34,7 @@ categories:
       - java
     keywords:
       - java
-    email_primary: \nJava is one of my strongest languages as I've been using it the longest.
+    email_primary: \nI have a good deal of experience with Java as its my first language and the language of instruction at my alma mater.
     email_secondary: Java
   web:
     query:

@@ -147,17 +147,20 @@ def main():
                             if EMAIL_SECONDARY in config[CATEGORIES][keyword[0]]:
                                 phrases.append(config[CATEGORIES][keyword[0]][EMAIL_SECONDARY])
 
-                        phrase = " " + delimit_commas(phrases) + config[EMAIL]['email_secondary_suffix']
-                        secondary_email_blurb += phrase
-                        substitutions[EMAIL_SECONDARY_REGEX] = secondary_email_blurb
+                        if len(phrases) == 0:
+                            substitutions[EMAIL_SECONDARY_REGEX] = config[EMAIL]['email_secondary_alternative']
+                        else:
+                            phrase = " " + delimit_commas(phrases) + config[EMAIL]['email_secondary_suffix']
+                            secondary_email_blurb += phrase
+                            substitutions[EMAIL_SECONDARY_REGEX] = secondary_email_blurb
                     else:
                         substitutions[EMAIL_SECONDARY_REGEX] = config[EMAIL]['email_secondary_alternative']
 
                 email = perform_substitutions(email, substitutions)
                 print email['body_plaintext']
 
-                # message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
-                # gmail.send(message)
+                message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
+                gmail.send(message)
 
 
 def load_config():
