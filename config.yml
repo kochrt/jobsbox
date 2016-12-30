@@ -8,7 +8,7 @@ use_email_file: true
 post_age: now-30d
 
 # how many results to get
-num_results: 30
+num_results: 50
 
 # file that has your gmail password
 password: password.txt
@@ -97,9 +97,10 @@ email:
   subject: Interested in { company }
 
   # Do this because the secondary email blurb is not included if the
-  # primary isn't either
+  # primary isn't either, or if there is only one match and therefore no secondary
   email_secondary_preamble: I also have experience with
-  email_secondary_suffix: \n
+  email_secondary_suffix: .\n
+  email_secondary_alternative: \n
 
   body: |
     Hello,

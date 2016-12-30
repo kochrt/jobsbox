@@ -21,6 +21,7 @@ LINK_REGEX = '\{[\W]*link[\W]*\}'
 QUERY = 'query'
 KEYWORDS = 'keywords'
 EMAIL_PRIMARY = 'email_primary'
+EMAIL_SECONDARY = 'email_secondary'
 POST_AGE = 'post_age'
 NUM_RESULTS = 'num_results'
 HITS = 'hits'
@@ -95,16 +96,16 @@ def main():
             else:
 
                 email = {
-                    'to': 'kochrt@gmail.com',
-                    'from': config['email']['from'],
-                    'subject': config['email']['subject'],
-                    'body_plaintext': config['email']['body'],
-                    'body_html': config['email']['body']
+                    'to': 'koch.rt@gmail.com',
+                    'from': config[EMAIL]['from'],
+                    'subject': config[EMAIL]['subject'],
+                    'body_plaintext': config[EMAIL]['body'],
+                    'body_html': config[EMAIL]['body']
                 }
 
                 # begin amassing what substitutions we need to make
                 substitutions = {
-                    EMAIL_SECONDARY_REGEX: config['email']['email_secondary_preamble']
+                    EMAIL_SECONDARY_REGEX: config[EMAIL]['email_secondary_preamble']
                 }
 
                 source_abbreviation = result['_source']['source_name']
@@ -118,7 +119,7 @@ def main():
                 # Company name truncated
                 company = re.sub(r'[,(].*$', "", result['_source']['company'])
 
-                substitutions[COMPANY_REGEX] = company if len(company) > 0 else config['email']['company_alternative']
+                substitutions[COMPANY_REGEX] = company if len(company) > 0 else config[EMAIL]['company_alternative']
 
                 # get rid of all html and extra punctuation
                 description = strip_all(description)
@@ -139,29 +140,23 @@ def main():
 
                     substitutions[EMAIL_PRIMARY_REGEX] = primary_email_blurb
 
-                    # TODO: round up secondary email stuff
+                    if len(counts) > 1:
+                        secondary_email_blurb = config[EMAIL]['email_secondary_preamble']
+                        phrases = []
+                        for keyword in counts[1:]:
+                            if EMAIL_SECONDARY in config[CATEGORIES][keyword[0]]:
+                                phrases.append(config[CATEGORIES][keyword[0]][EMAIL_SECONDARY])
 
+                        secondary_email_blurb += delimit_commas(phrases)
+                        substitutions[EMAIL_SECONDARY_REGEX] = secondary_email_blurb
+                    else:
+                        substitutions[EMAIL_SECONDARY_REGEX] = config[EMAIL]['email_secondary_alternative']
 
                 email = perform_substitutions(email, substitutions)
-                print json.dumps(email, indent=2)
-
+                print email['body_plaintext']
 
                 # message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
                 # gmail.send(message)
-
-                # do all other substitutions
-
-                # print primary_email_blurb
-                #
-                # print 'score:', json.dumps(result['_score'])
-                # print json.dumps(counter.get_counts_ordered(), indent=2)
-                # print
-
-                # for html
-                # description = re.sub(r'<[/]?[\w]*>', ' ', description)
-
-                # print description
-                # print
 
 
 def load_config():
@@ -185,13 +180,11 @@ def log(*string):
     for s in string:
         print s
 
-
 def perform_substitutions(email, substitutions):
     replaced = {}
     for email_key, string in email.iteritems():
 
         for sub_key, replacement in substitutions.iteritems():
-            #print 'replace %s with %s in %s' % (sub_key, replacement, string)
             string = re.sub(sub_key, replacement, string)
 
         if email_key == 'body_html':
@@ -201,6 +194,21 @@ def perform_substitutions(email, substitutions):
 
         replaced[email_key] = string
     return replaced
+
+
+def delimit_commas(strings):
+    if len(strings) == 1:
+        return strings[0]
+    if len(strings) == 2:
+        return strings[0] + " and " + strings[1]
+    built = strings[0] + ", and " + strings[1]
+    return __delimit_commas(built, strings[2:])
+
+
+def __delimit_commas(built, strings):
+    if len(strings) < 1:
+        return built
+    return __delimit_commas(strings[0] + ", " + built, strings[1:])
 
 
 if __name__ == '__main__':
