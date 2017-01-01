@@ -6,7 +6,7 @@
 use_email_file: true
 
 # how far back to query
-post_age: now-30d
+post_age: now-1d
 
 # how many results to get
 num_results: 100

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 from Models import *
 import requests
@@ -5,7 +6,7 @@ import yaml
 from gmail import *
 import re
 import os
-from time import gmtime, time, strftime
+from time import gmtime, strftime
 
 CONFIG = 'config.yml'
 HISTORY = 'history.json'
@@ -179,6 +180,8 @@ def main():
                     '_source': result['_source'],
                     'time': string_formatted_time()
                 }
+
+                log(log_file, "email sent: %s" % email)
 
         # save history
         if config[USE_EMAIL_FILE]:
