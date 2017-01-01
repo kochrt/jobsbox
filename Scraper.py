@@ -173,7 +173,7 @@ def main():
                 email = perform_substitutions(email, substitutions)
 
                 message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
-                # gmail.send(message)
+                gmail.send(message)
 
                 history[email['to']] = {
                     EMAIL: email,
