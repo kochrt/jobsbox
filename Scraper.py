@@ -4,7 +4,8 @@ import requests
 import yaml
 from gmail import *
 import re
-import time
+import os
+from time import gmtime, time, strftime
 
 CONFIG = 'config.yml'
 HISTORY = 'history.json'
@@ -37,16 +38,17 @@ SOURCE_MAPPING = {
     'bo': 'Boolerang',
     'aj': 'Authentic Jobs',
     'ww': 'We Work Remotely',
-    'cf': 'Coroflot',
     'gh': 'Github',
     'wh': 'Who is Hiring'
 }
+
 
 def main():
 
     # get configuration
     config = load_config()
     history = load_history()
+    log_file = create_log()
 
     query_strings = []
     categories = {}
@@ -100,7 +102,7 @@ def main():
                 continue
 
             elif config[USE_EMAIL_FILE] and email_address in history:
-                log('previous email encountered: %s' % email_address)
+                log(log_file, 'previous email encountered: %s' % email_address)
                 continue
                 # yes I know these continues aren't necessary
                 # I'm just being explicit
@@ -121,8 +123,8 @@ def main():
 
                 source_abbreviation = result['_source']['source_name']
                 if source_abbreviation not in SOURCE_MAPPING:
-                    log('new source encountered: %s' % source_abbreviation)
-                    log(json.dumps(result['_source'], indent=2))
+                    log(log_file, 'new source encountered: %s' % source_abbreviation)
+                    log(log_file, json.dumps(result['_source'], indent=2))
                     substitutions[POST_SITE_REGEX] = SOURCE_MAPPING['wh']
                 else:
                     substitutions[POST_SITE_REGEX] = SOURCE_MAPPING[source_abbreviation]
@@ -170,19 +172,22 @@ def main():
                 email = perform_substitutions(email, substitutions)
 
                 message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
+                # gmail.send(message)
 
                 history[email['to']] = {
                     EMAIL: email,
                     '_source': result['_source'],
-                    'time': time.time()
+                    'time': string_formatted_time()
                 }
 
         # save history
         if config[USE_EMAIL_FILE]:
             history_file = open(HISTORY, 'w')
-            json.dump(history, fp=history_file)
+            json.dump(history, history_file)
         else:
-            log(json.dumps(history, indent=2))
+            log(log_file, json.dumps(history, indent=2))
+
+        save_log(log_file)
 
 
 def load_config():
@@ -211,10 +216,24 @@ def get_email(description):
     return match.group() if match is not None else ''
 
 
-def log(*string):
-    # TODO: should output to log file
+def string_formatted_time():
+    return strftime('%Y-%m-%d %H.%M.%S', gmtime())
+
+
+def create_log():
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    return open('logs/%s.log' % string_formatted_time(), 'w+')
+
+
+def log(log_file, *string):
     for s in string:
-        print s
+        log_file.write(string_formatted_time() + ": " + s)
+    log_file.write('\r\n')
+
+
+def save_log(log_file):
+    log_file.close()
 
 
 def perform_substitutions(email, substitutions):
@@ -224,6 +243,7 @@ def perform_substitutions(email, substitutions):
         for sub_key, replacement in substitutions.iteritems():
             string = re.sub(sub_key, replacement, string)
 
+        # replace newline with corresponding newline in plaintext/html
         if email_key == 'body_html':
             string = re.sub('\n', '<br>', string)
         elif email_key == 'body_plaintext':

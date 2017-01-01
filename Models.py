@@ -76,7 +76,6 @@ class Request(object):
         if should_print:
             print(json.dumps(attr, indent=3))
 
-
     @staticmethod
     def add_string(attr, strings):
         if len(strings) < 1:

@@ -90,6 +90,7 @@ email:
   email_secondary_suffix: .\n
   email_secondary_alternative: \n
 
+  # The pipe preserves newlines '\n' which are changed to <br> for html emails
   body: |
     Hello,
 
