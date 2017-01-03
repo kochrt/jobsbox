@@ -80,7 +80,6 @@ email:
   # { company }           Company name else company_alternative
   # { email_primary }     Primary match email blurb from the categories dictionary above
   # { email_secondary }   Extra email part w/preamble (excluded if no {2})
-  # { link }              Link
 
   subject: Interested in { company }
 

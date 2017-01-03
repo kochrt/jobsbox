@@ -84,7 +84,7 @@ def main():
             print("password file could not be opened")
             exit()
 
-        gmail = GMail('kochrt@gmail.com', password)
+        gmail = GMail(config[EMAIL]['from'], password)
 
         # iterate over results
         for result in data:
@@ -216,7 +216,7 @@ def load_history():
 
 def get_email(description):
     match = re.search(r'[^@^:\s]+@[^@\s]+\.[a-zA-Z0-9]+', description)
-    return match.group() if match is not None else ''
+    return match.group(0) if match is not None else ''
 
 
 def string_formatted_time():
