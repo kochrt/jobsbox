@@ -7,6 +7,7 @@ from gmail import *
 import re
 import os
 from time import gmtime, strftime
+from smtplib import *
 
 CONFIG = 'config.yml'
 HISTORY = 'history.json'
@@ -173,7 +174,13 @@ def main():
                 email = perform_substitutions(email, substitutions)
 
                 message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
-                gmail.send(message)
+
+                try:
+                    gmail.send(message)
+                except (SMTPRecipientsRefused, SMTPDataError,
+                        SMTPConnectError, SMTPSenderRefused, SMTPServerDisconnected), err:
+                    log(log_file, err.message)
+                    continue
 
                 history[email['to']] = {
                     EMAIL: email,
