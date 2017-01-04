@@ -176,6 +176,7 @@ def main():
                 message = Message(email['subject'], email['to'], text=email['body_plaintext'], html=email['body_html'])
 
                 try:
+                    pass
                     # gmail.send(message)
                 except (SMTPRecipientsRefused, SMTPDataError,
                         SMTPConnectError, SMTPSenderRefused, SMTPServerDisconnected), err:
