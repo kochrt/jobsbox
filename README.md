@@ -12,7 +12,7 @@ gmail - `pip install gmail`
 - `password`: text file that has your gmail password
 - `categories`: what keywords you want to search on 
   - `email_primary`: what to say for the most-encountered category
-  - `email_secondary`: smaller blurb if this category has not been mentioned as much as others. All `email_secondary` fields are comma separated
+  - `email_secondary`: smaller blurb if this category has not been mentioned as much as others. All `email_secondary` fields will be joined and comma separated
   
 - `email`
   - `from`: your gmail address
