@@ -22,3 +22,7 @@ Optionally set up a cron job to have it run regularly
 `crontab -e`  
 `30 12  * * *   cd /path/to/jobsbox/ && .//path/to/jobsbox/Scraper.py`
 -> will run everyday at 12:30
+
+### Output/Other files
+Logs will be output to the `logs` directory including who was emailed, if new sources were encountered, etc. 
+If history is enabled `history.json` will be in the root directory and include much of the same information, except on a running basis
