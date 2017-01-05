@@ -3,3 +3,4 @@
 password.txt
 history.json
 logs/*
+*.pyc
