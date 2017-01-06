@@ -1,4 +1,6 @@
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Briefcase_font_awesome.svg" height=50 align="left">
 # jobsbox
+
 Python script to apply for jobs from whoishiring.io
 
 ### Dependencies
