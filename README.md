@@ -1,6 +1,7 @@
-<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Briefcase_font_awesome.svg" height=50 align="left" style="padding-top:15px; display:inline">
-<h1>jobsbox</h1>
-
+<div>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Briefcase_font_awesome.svg" height=50 align="left" style="padding-top:15px; display:inline">
+  <h1>jobsbox</h1>
+</div>
 Python script to apply for jobs from whoishiring.io
 
 ### Dependencies
