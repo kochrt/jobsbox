@@ -2,7 +2,6 @@
   <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Briefcase_font_awesome.svg" height=50 align="left" style="padding-top:15px; display:inline">
   <h1>jobsbox</h1>
 </div>
-Python script to apply for jobs from whoishiring.io
 
 ### Dependencies
 requests - `pip install requests`  
@@ -10,6 +9,7 @@ pyyaml - `pip install pyyaml`
 gmail - `pip install gmail`  
 
 ### Run
+You can optionally email posts that include an address if you provide a template email  
 **Edit `config.yml` to fit your needs**
 - `use_email_file`: if you want to keep track of who has been emailed so they aren't emailed multiple times
 - `password`: text file that has your gmail password
